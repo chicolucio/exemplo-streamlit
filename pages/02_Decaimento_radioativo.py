@@ -50,6 +50,9 @@ for label, coluna in zip(labels, colunas_checkboxes):
         checkbox = st.checkbox(label)
         checkboxes[label] = checkbox
 
+if checkboxes["Escala logarítmica"] and checkboxes["Linearização"]:
+    st.warning("Linearização só funciona se desmarcar escala logarítmica", icon="⚠️")
+
 fig, ax = fosforo32.plot(
     erro=checkboxes["Incerteza"],
     escala_log10=checkboxes["Escala logarítmica"],
