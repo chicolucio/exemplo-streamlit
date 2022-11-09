@@ -80,6 +80,20 @@ else:
 
     st.plotly_chart(fig, use_container_width=True)
 
+st.latex(
+    rf"""
+\text{{Equação de fit}}: {fosforo32.fit_exponencial().valores_otimos.pre_exp:.1f} 
+\exp(-{fosforo32.fit_exponencial().valores_otimos.taxa_decaimento:.4f}t) + 
+{fosforo32.fit_exponencial().valores_otimos.constante:.2f}"""
+)
+
+st.latex(
+    rf"t_{{1/2}} \text{{ literatura}}: {fosforo32.literatura_meia_vida} \text{{ dias}}"
+)
+st.latex(
+    rf"t_{{1/2}} \text{{ calculado}}: {fosforo32.tempo_de_meia_vida} \text{{ dias}}"
+)
+
 dataframe = st.expander("Clique para ver os dados experimentais")
 
 with dataframe:
