@@ -40,6 +40,10 @@ fosforo32 = DecaimentoRadioativo(
     literatura_numero_pontos=120,
 )
 
+backend_grafico = st.selectbox(
+    "Escolha o backend gráfico", ("Matplotlib", "Plotly"), index=1
+)
+
 labels = ("Incerteza", "Literatura", "Fit", "Escala logarítmica", "Linearização")
 colunas_checkboxes = st.columns(len(labels))
 
@@ -53,15 +57,28 @@ for label, coluna in zip(labels, colunas_checkboxes):
 if checkboxes["Escala logarítmica"] and checkboxes["Linearização"]:
     st.warning("Linearização só funciona se desmarcar escala logarítmica", icon="⚠️")
 
-fig, ax = fosforo32.plot(
-    erro=checkboxes["Incerteza"],
-    escala_log10=checkboxes["Escala logarítmica"],
-    curva_literatura=checkboxes["Literatura"],
-    linearizacao=checkboxes["Linearização"],
-    fit=checkboxes["Fit"],
-)
+if backend_grafico == "Matplotlib":
+    fig, ax = fosforo32.plot(
+        erro=checkboxes["Incerteza"],
+        escala_log10=checkboxes["Escala logarítmica"],
+        curva_literatura=checkboxes["Literatura"],
+        linearizacao=checkboxes["Linearização"],
+        fit=checkboxes["Fit"],
+    )
 
-st.pyplot(fig)
+    st.pyplot(fig)
+
+else:
+    fig = fosforo32.plot(
+        backend="plotly",
+        erro=checkboxes["Incerteza"],
+        escala_log10=checkboxes["Escala logarítmica"],
+        curva_literatura=checkboxes["Literatura"],
+        linearizacao=checkboxes["Linearização"],
+        fit=checkboxes["Fit"],
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
 
 dataframe = st.expander("Clique para ver os dados experimentais")
 

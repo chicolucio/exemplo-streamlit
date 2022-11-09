@@ -3,6 +3,7 @@ from collections import namedtuple
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
+import plotly.graph_objects as go
 from uncertainties import unumpy
 from scipy.optimize import curve_fit
 import pandas as pd
@@ -82,7 +83,7 @@ class DecaimentoRadioativo:
             contagem_teorico = np.log(contagem_teorico)
         return t_teorico, contagem_teorico
 
-    def plot(
+    def _plot_matplotlib(
         self,
         erro=True,
         linearizacao=False,
@@ -138,6 +139,94 @@ class DecaimentoRadioativo:
         ax.legend()
         fig.set_tight_layout(True)
         return fig, ax
+
+    def _plot_plotly(
+        self,
+        erro=True,
+        linearizacao=False,
+        curva_literatura=False,
+        fit=False,
+        escala_log10=False,
+    ):
+        fig = go.Figure()
+
+        if escala_log10:
+            linearizacao = False
+            fig.update_layout(
+                yaxis=dict(
+                    type="log", tickformat=".2f", title="log<sub>10</sub>Contagem"
+                )
+            )
+
+        if linearizacao:
+            y = unumpy.log(self.contagem_com_incerteza)
+            fig.update_layout(yaxis=dict(title="ln Contagem"))
+        else:
+            y = self.contagem_com_incerteza
+            if not escala_log10:
+                fig.update_layout(yaxis=dict(title="Contagem"))
+
+        fig.add_trace(
+            go.Scatter(
+                x=self.tempo,
+                y=unumpy.nominal_values(y),
+                mode="markers",
+                error_y=dict(
+                    type="data",
+                    array=unumpy.std_devs(y),
+                    visible=erro,
+                    color="black",
+                    thickness=1.0,
+                ),
+                name="Experimento",
+            )
+        )
+
+        if curva_literatura:
+            x, y = self.pontos_literatura(linearizacao)
+            fig.add_trace(go.Scatter(x=x, y=y, name="Literatura", mode="lines"))
+
+        if fit:
+            popt, _, _ = self.fit_exponencial()
+            if linearizacao:
+                y_fit = np.log(self.exponencial(self.tempo, *popt))
+            else:
+                y_fit = self.exponencial(self.tempo, *popt)
+            fig.add_trace(go.Scatter(x=self.tempo, y=y_fit, name="Fit", mode="lines"))
+
+        fig.update_layout(
+            xaxis=dict(title="Tempo / dias"),
+            margin=dict(autoexpand=True, t=10, b=10, l=10, r=10),
+            legend=dict(orientation="h", yanchor="top", y=1.1, xanchor="left"),
+            modebar=dict(orientation="v"),
+            modebar_add=("v1hovermode", "hovercompare", "toggleSpikelines"),
+        )
+
+        return fig
+
+    def plot(
+        self,
+        backend="matplotlib",
+        erro=True,
+        linearizacao=False,
+        curva_literatura=False,
+        fit=False,
+        escala_log10=False,
+    ):
+
+        match backend:
+            case "matplotlib":
+                return self._plot_matplotlib(
+                    erro, linearizacao, curva_literatura, fit, escala_log10
+                )
+            case "plotly":
+                return self._plot_plotly(
+                    erro, linearizacao, curva_literatura, fit, escala_log10
+                )
+            case _:
+                raise ValueError("Backend inválido. Tente 'matplotlib' ou 'plotly'.")
+
+        pass
 
 
 if __name__ == "__main__":
