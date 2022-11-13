@@ -1,6 +1,10 @@
 import streamlit as st
 from src.decay import DADOS, DecaimentoRadioativo
 
+st.set_page_config(
+    page_title="Decaimento radioativo - PyMat 2022", page_icon="images/pymat.ico"
+)
+
 TEXTO = "pages/decaimento.md"
 
 st.title("Exemplo - Decaimento radioativo")
