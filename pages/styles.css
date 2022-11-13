@@ -1,0 +1,34 @@
+/*nice round photos for about page*/
+.e1tzin5v2 .etr89bj1[data-testid="stImage"] img {
+    border-radius: 50%;
+}
+
+/*main titles should be clearer and centered*/
+h1 {
+    font-weight: bold;
+    text-align: center;
+}
+
+/*subheaders should be clearer and centered*/
+.css-10trblm.e16nr0p30 {
+    font-weight: bold;
+    text-align: center;
+}
+
+/*columns centered*/
+.e1tzin5v2 {
+    text-align: center;
+}
+
+/*hide Streamlit components*/
+MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+header {
+    visibility: hidden;
+}
